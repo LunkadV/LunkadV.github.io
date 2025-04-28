@@ -20,6 +20,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
+    // Change header background on scroll
+    window.addEventListener('scroll', function() {
+        const header = document.querySelector('header');
+        header.classList.toggle('scrolled', window.scrollY > 10);
+    });
+    
     // Smooth scrolling for navigation links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
@@ -61,6 +67,39 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+    
+    // Animation on scroll
+    const animationElements = [
+        { selector: '.section-title', className: 'fade-in', offset: 100 },
+        { selector: '.card', className: 'slide-up', offset: 150 },
+        { selector: '.project-card', className: 'slide-up', offset: 150 },
+        { selector: '.hero-content', className: 'slide-right', offset: 0 }
+    ];
+    
+    function checkAnimation() {
+        const windowHeight = window.innerHeight;
+        const windowTop = window.pageYOffset;
+        
+        animationElements.forEach(item => {
+            const elements = document.querySelectorAll(item.selector);
+            
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top + windowTop;
+                
+                if (windowTop + windowHeight - item.offset > elementTop) {
+                    element.classList.add(item.className);
+                }
+            });
+        });
+    }
+    
+    // Check for animations on load
+    window.addEventListener('load', () => {
+        setTimeout(checkAnimation, 100);
+    });
+    
+    // Check for animations on scroll
+    window.addEventListener('scroll', checkAnimation);
     
     // Form validation and submission
     const contactForm = document.getElementById('contact-form');
@@ -129,18 +168,31 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function highlightError(element) {
         element.classList.add('error');
-        element.parentElement.classList.add('error-message');
+        element.style.borderColor = '#e74c3c';
     }
     
     function removeHighlight(element) {
         element.classList.remove('error');
-        element.parentElement.classList.remove('error-message');
+        element.style.borderColor = '';
     }
     
     function showFormMessage(message, type) {
         const formMessage = document.createElement('div');
         formMessage.className = `form-message ${type}`;
         formMessage.textContent = message;
+        formMessage.style.padding = '10px';
+        formMessage.style.marginTop = '15px';
+        formMessage.style.borderRadius = '4px';
+        
+        if (type === 'success') {
+            formMessage.style.backgroundColor = '#d4edda';
+            formMessage.style.color = '#155724';
+            formMessage.style.border = '1px solid #c3e6cb';
+        } else {
+            formMessage.style.backgroundColor = '#f8d7da';
+            formMessage.style.color = '#721c24';
+            formMessage.style.border = '1px solid #f5c6cb';
+        }
         
         const contactForm = document.getElementById('contact-form');
         contactForm.parentElement.appendChild(formMessage);
@@ -151,53 +203,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 5000);
     }
     
-    // Project filtering (if you add this feature later)
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    if (filterButtons.length > 0) {
-        filterButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                // Remove active class from all buttons
-                filterButtons.forEach(btn => btn.classList.remove('active'));
-                
-                // Add active class to clicked button
-                button.classList.add('active');
-                
-                // Get the filter value
-                const filterValue = button.getAttribute('data-filter');
-                
-                // Filter the projects
-                const projects = document.querySelectorAll('.project-card');
-                projects.forEach(project => {
-                    if (filterValue === 'all') {
-                        project.style.display = 'block';
-                    } else if (project.classList.contains(filterValue)) {
-                        project.style.display = 'block';
-                    } else {
-                        project.style.display = 'none';
-                    }
-                });
-            });
-        });
+    // Dynamic year in footer copyright
+    const currentYear = new Date().getFullYear();
+    const footerYear = document.querySelector('.footer-text');
+    if (footerYear) {
+        footerYear.innerHTML = footerYear.innerHTML.replace('2025', currentYear);
     }
-    
-    // Animation on scroll (optional - you can add a library like AOS later if desired)
-    // For now, we'll keep it simple with a basic implementation
-    const animatedElements = document.querySelectorAll('.animate');
-    
-    function checkInView() {
-        animatedElements.forEach(element => {
-            const elementPosition = element.getBoundingClientRect();
-            const windowHeight = window.innerHeight;
-            
-            if (elementPosition.top < windowHeight - 50) {
-                element.classList.add('animated');
-            }
-        });
-    }
-    
-    // Check elements on load
-    checkInView();
-    
-    // Check elements on scroll
-    window.addEventListener('scroll', checkInView);
 });
